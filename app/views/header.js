@@ -103,8 +103,13 @@ module.exports = Backbone.View.extend({
       var date = util.extractDate(name);
       var extension = name.split('.').pop();
 
-      path = parts.join('/') + '/' + date + '-' +
-        util.stringToUrl(value) + '.' + extension;
+      if (parts[0] === '_posts') {
+        path = parts.join('/') + '/' + date + '-' +
+          util.stringToUrl(value) + '.' + extension;
+      } else {
+        path = parts.join('/') + '/' +
+          util.stringToUrl(value) + '.' + extension;
+      }
 
       this.file.set('path', path);
     }
