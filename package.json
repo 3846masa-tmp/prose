@@ -60,7 +60,7 @@
     "test-ci": "gulp test-ci",
     "start": "npm-run-all -p start:watch start:serve",
     "start:watch": "gulp watch",
-    "start:serve": "serve",
+    "start:serve": "serve --port 8000",
     "build": "npm-run-all build:clean build:production",
     "build:clean": "gulp clean",
     "build:production": "gulp production"

@@ -387,7 +387,7 @@ module.exports = Backbone.View.extend({
     if (this.model.get('markdown') && this.model.get('writable')) {
       upload.dragDrop(this.$el, (function(e, file, content) {
         if (this.$el.find('#dialog').hasClass('dialog')) {
-          this.updateImageInsert(e, file, content);
+          return false;
         } else {
           // Clear selection
           this.editor.focus();

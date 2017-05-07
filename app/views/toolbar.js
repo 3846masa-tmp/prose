@@ -6,6 +6,7 @@ var Backbone = require('backbone');
 var toolbar = require('../toolbar/markdown.js');
 var upload = require('../upload');
 var templates = require('../../dist/templates');
+var config = require('../config');
 
 module.exports = Backbone.View.extend({
   template: templates.toolbar,
@@ -14,6 +15,7 @@ module.exports = Backbone.View.extend({
     'click .group a': 'markdownSnippet',
     'click .publish-flag': 'togglePublishing',
     'change #upload': 'fileInput',
+    'click #selectFromGoogle': 'fileSelectFromGoogle',
     'click .dialog .insert': 'dialogInsert',
     'click .draft-to-post': 'post'
   },
@@ -78,6 +80,44 @@ module.exports = Backbone.View.extend({
     });
 
     return false;
+  },
+
+  fileSelectFromGoogle: function(e) {
+    var view = this;
+    if (!window.gapi || !window.google) {
+      alert('Google API isn\'t loaded.');
+      return;
+    }
+
+    var authConfig = {
+      'client_id': config.googleClientId,
+      'scope': [
+        'https://www.googleapis.com/auth/photos',
+      ],
+      'immediate': false
+    };
+
+    window.gapi.auth.authorize(authConfig, function (authResult) {
+      if (!authResult || authResult.error) {
+        alert('Authentication failed.');
+        throw new Error('Authentication failed.');
+      }
+      var picker = new google.picker.PickerBuilder()
+        .addView(google.picker.ViewId.PHOTOS)
+        .setLocale('ja')
+        .setOAuthToken(authResult.access_token)
+        .setDeveloperKey(config.googleDeveloperKey)
+        .setCallback(function (data) {
+          if (data[google.picker.Response.ACTION] !== google.picker.Action.PICKED) {
+            return;
+          }
+          var fileInfo = data[google.picker.Response.DOCUMENTS][0];
+          view.$el.find('input[name="url"]').val(fileInfo.thumbnails.pop().url);
+          view.$el.find('input[name="alt"]').val(fileInfo.name);
+        })
+        .build();
+      picker.setVisible(true);
+    });
   },
 
   highlight: function(type) {
@@ -207,9 +247,7 @@ module.exports = Backbone.View.extend({
           case 'media':
             tmpl = _(templates.dialogs.media).template();
             $dialog.append(tmpl({
-              description: t('dialogs.media.description', {
-                input: '<input id="upload" class="upload" type="file" />'
-              }),
+              description: t('dialogs.media.descriptionForGooglePicker'),
               assetsDirectory: (self.media && self.media.length) ? true : false,
               writable: self.file.get('writable')
             }));
