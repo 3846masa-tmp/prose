@@ -2,13 +2,14 @@ var $ = require('jquery-browserify');
 var _ = require('underscore');
 var templates = require('../dist/templates');
 var chrono = require('chrono');
+var slugize = require('hexo-util/lib/slugize');
 
 module.exports = {
 
   // Cleans up a string for use in urls
   stringToUrl: function(string) {
     // Change non-alphanumeric characters to dashes, trim excess dashes
-    return string.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-*$/, '');
+    return slugize(string, { transform: 1 });
   },
 
   // Extract a Jekyll date format from a filename
