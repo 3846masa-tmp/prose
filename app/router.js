@@ -354,7 +354,7 @@ module.exports = Backbone.Router.extend({
 
     // If user has authenticated
     if (this.user) {
-      router.navigate(this.user.get('login'), {
+      router.navigate('MiyashitaLab', {
         trigger: true,
         replace: true
       });
